@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FDA Combined Calculator</title>
-  <style>
-:root {
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FDA Combined Calculator</title>
+<style>
+
+    :root {
       --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
       --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
       --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
@@ -212,916 +213,324 @@
     .muted { color: var(--color-text-muted); }
     .error { color: var(--color-warning); font-size: var(--text-sm); min-height: 1.5em; margin-top: var(--space-3); }
     .formula { font-size: var(--text-sm); color: var(--color-text-muted); }
+  
+.tabs { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-3); margin-bottom:var(--space-5); }
+.tab-btn { min-height:48px; border-radius:var(--radius-lg); border:1px solid var(--color-border); background:var(--color-surface); color:var(--color-text); font-weight:700; cursor:pointer; }
+.tab-btn.active { background:var(--color-primary); color:#fff; border-color:var(--color-primary); }
+.tab-panel { display:none; }
+.tab-panel.active { display:block; animation:fadeIn 120ms ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+.result-main { font-weight:800; font-size:var(--text-lg); }
+.result-sub { display:block; font-size:var(--text-sm); color:var(--color-text-muted); margin-top:4px; }
+.avg-line { margin-top:var(--space-3); }
 
-  .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-  .tab-btn { min-height: 48px; border-radius: 14px; border: 1px solid #d1d5db; background: #ffffff; color: #111827; font-weight: 700; }
-  .tab-btn.active { background: #2563eb; color: #fff; border-color: #2563eb; }
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; animation: fadeIn 120ms ease; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+.compact-mobile .app { max-width: 1100px; padding: max(env(safe-area-inset-top), var(--space-4)) var(--space-3) max(env(safe-area-inset-bottom), var(--space-4)); }
+.compact-mobile .tabs { gap: var(--space-2); margin-bottom: var(--space-4); }
+.compact-mobile .card { padding: var(--space-4); margin-bottom: var(--space-3); }
+.compact-mobile .topbar { margin-bottom: var(--space-4); }
+.compact-mobile .result-main { font-size: var(--text-lg); }
+.compact-mobile .result-sub { display:block; font-size: var(--text-sm); color: var(--color-text-muted); margin-top: 4px; }
+.compact-mobile .stat .label { display:block; font-size: var(--text-xs); color: var(--color-text-muted); margin-bottom: 4px; }
+@media (max-width: 699px) {
+  .compact-mobile .app { padding-left: 10px; padding-right: 10px; }
+  .compact-mobile h1 { font-size: 1.5rem; margin: 0; }
+  .compact-mobile .topbar { gap: var(--space-2); }
+  .compact-mobile .topbar-left { gap: 4px; }
+  .compact-mobile .eyebrow { margin: 0; }
+  .compact-mobile .tabs { position: sticky; top: 0; z-index: 10; background: var(--color-bg); padding-bottom: 4px; }
+  .compact-mobile .grid.three { gap: 8px; }
+  .compact-mobile .grid.three label { font-size: 12px; }
+  .compact-mobile input { min-height: 42px; padding: 0 10px; font-size: 16px; }
+  .compact-mobile .results { gap: 8px; }
+  .compact-mobile .card { padding: 12px; }
+  .compact-mobile .result-main { font-size: 1.1rem; }
+  .compact-mobile .result-sub { font-size: 0.78rem; }
+}
 
-  </style>
+</style>
 </head>
-<body>
-  <div class="tabs" role="tablist" aria-label="Calculator tabs">
-    <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="tab-baseline" id="btn-baseline" data-tab="baseline">Baseline</button>
-    <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-wash" id="btn-wash" data-tab="wash">Wash</button>
+<body class="compact-mobile">
+<div class="app">
+  <div class="topbar">
+    <div class="topbar-right" style="margin-left:auto;">
+      <button id="themeToggle" class="icon-btn" type="button" aria-label="Toggle theme">◐</button>
+    </div>
   </div>
 
-  <section id="tab-baseline" class="tab-panel active" role="tabpanel" aria-labelledby="btn-baseline">
-<main class="app">
-    <section class="topbar">
-      <div class="topbar-left">
-        <h1 class="title">Micro Lab Calculator</h1>
-        <p class="subtitle">Enter triplicate counts for 10^-4, 10^-5, and 10^-6. The calculator averages each dilution, applies the 25-250 countable range rule, selects the lowest dilution in range, and reports CFU/mL, CFU/hand, and log10 CFU/hand.</p>
-      </div>
-      <div class="topbar-right">
-        <button class="theme-toggle" type="button" aria-label="Toggle theme" id="themeToggle">◐</button>
-      </div>
-    </section>
+  <div class="tabs" role="tablist" aria-label="Calculator tabs">
+    <button class="tab-btn active" type="button" data-tab="baseline">Baseline</button>
+    <button class="tab-btn" type="button" data-tab="wash">Wash</button>
+  </div>
 
-    <section class="card">
-      <div class="stack">
-        <div class="group">
+  <section id="tab-baseline" class="tab-panel active">
+    <div class="card">
+      <p class="subtitle">Enter triplicate counts for 10^-4, 10^-5, and 10^-6. Lowest countable dilution in the 25-250 range is used. [file:1]</p>
+    </div>
+    
+        <article class="card">
           <div class="row-head">
-            <strong>10^-4</strong>
-            <span class="pill" id="pill-4">Waiting for data</span>
+            <div>
+              <h3>10^-4</h3>
+              <p class="muted" id="b-pill-4">Waiting for data</p>
+            </div>
           </div>
           <div class="grid three">
-            <label>Plate 1<input id="d4-1" inputmode="decimal" placeholder="e.g. 42" autocomplete="off"></label>
-            <label>Plate 2<input id="d4-2" inputmode="decimal" placeholder="e.g. 44" autocomplete="off"></label>
-            <label>Plate 3<input id="d4-3" inputmode="decimal" placeholder="e.g. 41" autocomplete="off"></label>
+            <label>Replicate 1<input id="b-d4-1" inputmode="decimal" /></label>
+            <label>Replicate 2<input id="b-d4-2" inputmode="decimal" /></label>
+            <label>Replicate 3<input id="b-d4-3" inputmode="decimal" /></label>
           </div>
-          <div class="small muted mono" id="avg-4" style="margin-top:0.75rem;">Average: —</div>
-        </div>
+          <p class="muted avg-line" id="b-avg-4">Average: —</p>
+        </article>
 
-        <div class="group">
+        <article class="card">
           <div class="row-head">
-            <strong>10^-5</strong>
-            <span class="pill" id="pill-5">Waiting for data</span>
+            <div>
+              <h3>10^-5</h3>
+              <p class="muted" id="b-pill-5">Waiting for data</p>
+            </div>
           </div>
           <div class="grid three">
-            <label>Plate 1<input id="d5-1" inputmode="decimal" placeholder="e.g. 12" autocomplete="off"></label>
-            <label>Plate 2<input id="d5-2" inputmode="decimal" placeholder="e.g. 10" autocomplete="off"></label>
-            <label>Plate 3<input id="d5-3" inputmode="decimal" placeholder="e.g. 11" autocomplete="off"></label>
+            <label>Replicate 1<input id="b-d5-1" inputmode="decimal" /></label>
+            <label>Replicate 2<input id="b-d5-2" inputmode="decimal" /></label>
+            <label>Replicate 3<input id="b-d5-3" inputmode="decimal" /></label>
           </div>
-          <div class="small muted mono" id="avg-5" style="margin-top:0.75rem;">Average: —</div>
-        </div>
+          <p class="muted avg-line" id="b-avg-5">Average: —</p>
+        </article>
 
-        <div class="group">
+        <article class="card">
           <div class="row-head">
-            <strong>10^-6</strong>
-            <span class="pill" id="pill-6">Waiting for data</span>
+            <div>
+              <h3>10^-6</h3>
+              <p class="muted" id="b-pill-6">Waiting for data</p>
+            </div>
           </div>
           <div class="grid three">
-            <label>Plate 1<input id="d6-1" inputmode="decimal" placeholder="e.g. 2" autocomplete="off"></label>
-            <label>Plate 2<input id="d6-2" inputmode="decimal" placeholder="e.g. 1" autocomplete="off"></label>
-            <label>Plate 3<input id="d6-3" inputmode="decimal" placeholder="e.g. 3" autocomplete="off"></label>
+            <label>Replicate 1<input id="b-d6-1" inputmode="decimal" /></label>
+            <label>Replicate 2<input id="b-d6-2" inputmode="decimal" /></label>
+            <label>Replicate 3<input id="b-d6-3" inputmode="decimal" /></label>
           </div>
-          <div class="small muted mono" id="avg-6" style="margin-top:0.75rem;">Average: —</div>
-        </div>
-      </div>
-
-      <div class="actions">
-        <button class="btn btn-secondary" type="button" id="clearBtn">Clear All</button>
-      </div>
-      <div class="error" id="error"></div>
-    </section>
-
-    <section class="card">
+          <p class="muted avg-line" id="b-avg-6">Average: —</p>
+        </article>
+    <div class="card">
       <div class="results">
-        <div class="stat">
-          <div class="stat-label">Used dilution</div>
-          <div class="stat-value mono" id="usedDilution">—</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Average count</div>
-          <div class="stat-value mono" id="avgValue">—</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">CFU/mL</div>
-          <div class="stat-value mono" id="cfuMlValue">—</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">CFU/hand</div>
-          <div class="stat-value mono" id="cfuHandValue">—</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">log10 CFU/hand</div>
-          <div class="stat-value mono" id="logValue">—</div>
-        </div>
+        <div class="stat"><span class="label">Used dilution</span><span class="value" id="b-usedDilution">—</span></div>
+        <div class="stat"><span class="label">Reported average count</span><span class="value" id="b-avgValue">—</span></div>
+        <div class="stat"><span class="label">Reported CFU/mL</span><span class="value" id="b-cfuMlValue">—</span></div>
+        <div class="stat"><span class="label">Reported CFU/hand</span><span class="value" id="b-cfuHandValue">—</span></div>
+        <div class="stat"><span class="label">Reported log10 CFU/hand</span><span class="value" id="b-logValue">—</span></div>
       </div>
-      <p class="formula" id="formulaText">Formula: average triplicate count must be within 25-250; use the lowest dilution in countable range; CFU/mL = average x 10^dilution exponent; CFU/hand = CFU/mL x 75; log10 = log10(CFU/hand).</p>
-    </section>
-  </main>
-
-  <script>
-    const $ = (id) => document.getElementById(id);
-
-    function setTheme() {
-      const root = document.documentElement;
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
-    }
-
-    function toggleTheme() {
-      const root = document.documentElement;
-      root.setAttribute('data-theme', root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-    }
-
-    function parseNum(v) {
-      const s = v.trim();
-      if (s === '') return null;
-      const n = Number(s.replace(/,/g, ''));
-      return Number.isNaN(n) ? NaN : n;
-    }
-
-    function fmtNumber(n) {
-      if (!Number.isFinite(n)) return '—';
-      if (Number.isInteger(n)) return String(n);
-      return Number(n.toFixed(2)).toString();
-    }
-
-    function fmtSci(n) {
-      if (!Number.isFinite(n) || n <= 0) return '—';
-      const exp = Math.floor(Math.log10(n));
-      const mant = n / (10 ** exp);
-      return mant.toFixed(2) + ' x 10^' + exp;
-    }
-
-    function avgTriplicate(values) {
-      if (values.some(v => Number.isNaN(v))) return NaN;
-      if (values.some(v => v !== null && v < 0)) return NaN;
-      const filled = values.filter(v => v !== null);
-      if (filled.length === 0) return null;
-      if (filled.length !== 3) return 'incomplete';
-      return (filled[0] + filled[1] + filled[2]) / 3;
-    }
-
-    const COUNTABLE_MIN = 25;
-    const COUNTABLE_MAX = 250;
-
-    const dilutionRows = [
-      { key: '4', exponent: 4, label: '10^-4', inputs: ['d4-1', 'd4-2', 'd4-3'], avgNode: 'avg-4', pillNode: 'pill-4' },
-      { key: '5', exponent: 5, label: '10^-5', inputs: ['d5-1', 'd5-2', 'd5-3'], avgNode: 'avg-5', pillNode: 'pill-5' },
-      { key: '6', exponent: 6, label: '10^-6', inputs: ['d6-1', 'd6-2', 'd6-3'], avgNode: 'avg-6', pillNode: 'pill-6' }
-    ];
-
-    function resetPills() {
-      dilutionRows.forEach(row => {
-        $(row.pillNode).textContent = 'Waiting for data';
-      });
-    }
-
-    function calculate() {
-      const errorNode = $('error');
-      errorNode.textContent = '';
-      resetPills();
-
-      const validRows = [];
-
-      for (const row of dilutionRows) {
-        const values = row.inputs.map(id => parseNum($(id).value));
-        const avg = avgTriplicate(values);
-        const avgNode = $(row.avgNode);
-        const pillNode = $(row.pillNode);
-
-        if (avg === null) {
-          avgNode.textContent = 'Average: —';
-          pillNode.textContent = 'Waiting for data';
-          continue;
-        }
-
-        if (avg === 'incomplete') {
-          avgNode.textContent = 'Average: —';
-          pillNode.textContent = 'Enter all 3';
-          if (!errorNode.textContent) errorNode.textContent = 'Each dilution must have all 3 replicate values before it can be used.';
-          continue;
-        }
-
-        if (Number.isNaN(avg)) {
-          avgNode.textContent = 'Average: —';
-          pillNode.textContent = 'Invalid entry';
-          errorNode.textContent = 'Use valid numbers that are zero or greater.';
-          continue;
-        }
-
-        avgNode.textContent = 'Average: ' + fmtNumber(avg);
-
-        if (avg >= COUNTABLE_MIN && avg <= COUNTABLE_MAX) {
-          pillNode.textContent = 'Countable';
-          validRows.push({ ...row, avg });
-        } else if (avg < COUNTABLE_MIN) {
-          pillNode.textContent = '<25';
-        } else {
-          pillNode.textContent = '>250';
-        }
-      }
-
-      const selected = validRows.length ? validRows[0] : null;
-
-      if (!selected) {
-        $('usedDilution').textContent = '—';
-        $('avgValue').textContent = '—';
-        $('cfuMlValue').textContent = '—';
-        $('cfuHandValue').textContent = '—';
-        $('logValue').textContent = '—';
-        $('formulaText').textContent = 'Formula: average triplicate count must be within 25-250; use the lowest dilution in countable range; CFU/mL = average x 10^dilution exponent; CFU/hand = CFU/mL x 75; log10 = log10(CFU/hand).';
-        if (!errorNode.textContent) errorNode.textContent = 'No dilution is currently in the 25-250 countable range.';
-        return;
-      }
-
-      $(selected.pillNode).textContent = 'Used';
-
-      const cfuMl = selected.avg * (10 ** selected.exponent);
-      const cfuHand = cfuMl * 75;
-      const logHand = Math.log10(cfuHand);
-
-      $('usedDilution').textContent = selected.label;
-      $('avgValue').textContent = fmtNumber(selected.avg);
-      $('cfuMlValue').textContent = fmtSci(cfuMl);
-      $('cfuHandValue').textContent = fmtSci(cfuHand);
-      $('logValue').textContent = Number(logHand.toFixed(2)).toFixed(2);
-      $('formulaText').textContent =
-        'Using ' + selected.label + ' because it is the lowest dilution with an average in the 25-250 countable range. Average = ' + fmtNumber(selected.avg) +
-        '; CFU/mL = ' + fmtNumber(selected.avg) + ' x 10^' + selected.exponent + ' = ' + fmtSci(cfuMl) +
-        '; CFU/hand = ' + fmtSci(cfuMl) + ' x 75 = ' + fmtSci(cfuHand) +
-        '; log10(CFU/hand) = ' + Number(logHand.toFixed(2)).toFixed(2) + '.';
-    }
-
-    function clearAll() {
-      dilutionRows.forEach(row => {
-        row.inputs.forEach(id => $(id).value = '');
-        $(row.avgNode).textContent = 'Average: —';
-        $(row.pillNode).textContent = 'Waiting for data';
-      });
-
-      $('error').textContent = '';
-      $('usedDilution').textContent = '—';
-      $('avgValue').textContent = '—';
-      $('cfuMlValue').textContent = '—';
-      $('cfuHandValue').textContent = '—';
-      $('logValue').textContent = '—';
-      $('formulaText').textContent = 'Formula: average triplicate count must be within 25-250; use the lowest dilution in countable range; CFU/mL = average x 10^dilution exponent; CFU/hand = CFU/mL x 75; log10 = log10(CFU/hand).';
-
-      $('d4-1').focus();
-    }
-
-    function init() {
-      setTheme();
-      $('themeToggle').addEventListener('click', toggleTheme);
-      $('clearBtn').addEventListener('click', clearAll);
-
-      dilutionRows.forEach(row => {
-        row.inputs.forEach(id => {
-          $(id).addEventListener('input', calculate);
-          $(id).addEventListener('change', calculate);
-          $(id).addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') calculate();
-          });
-        });
-      });
-    }
-
-    init();
-  </script>
+      <p class="error" id="b-error"></p>
+      <p class="muted" id="b-formulaText">Formula: average triplicate count must be within 25-250; use the lowest dilution in countable range; CFU/mL = average x 10^dilution exponent; CFU/hand = CFU/mL x 75; log10 = log10(CFU/hand). [file:1]</p>
+      <div class="actions"><button class="btn btn-secondary" type="button" id="b-clearBtn">Clear</button></div>
+    </div>
   </section>
 
-  <section id="tab-wash" class="tab-panel" role="tabpanel" aria-labelledby="btn-wash">
-<main class="app">
-    <section class="topbar">
-      <div class="topbar-left">
-        <h1 class="title">Micro Lab Calculator</h1>
-        <p class="subtitle">Enter triplicate counts for 10^-2, 10^-3, 10^-4, and 10^-5. The calculator averages each dilution, applies the 25-250 countable range rule, selects the lowest dilution in range, and reports CFU/mL, CFU/hand, and log10 CFU/hand using rounded reported values.</p>
-      </div>
-      <div class="topbar-right">
-        <button class="theme-toggle" type="button" aria-label="Toggle theme" id="themeToggle">◐</button>
-      </div>
-    </section>
-
-    <section class="card">
-      <div class="stack">
-        <div class="group">
+  <section id="tab-wash" class="tab-panel">
+    <div class="card">
+      <p class="subtitle">Enter triplicate counts for 10^-2, 10^-3, 10^-4, and 10^-5. Lowest countable dilution in the 25-250 range is used. [file:2]</p>
+    </div>
+    
+        <article class="card">
           <div class="row-head">
-            <strong>10^-2</strong>
-            <span class="pill" id="pill-2">Waiting for data</span>
+            <div>
+              <h3>10^-2</h3>
+              <p class="muted" id="w-pill-2">Waiting for data</p>
+            </div>
           </div>
           <div class="grid three">
-            <label>Plate 1<input id="d2-1" inputmode="decimal" placeholder="e.g. 180" autocomplete="off"></label>
-            <label>Plate 2<input id="d2-2" inputmode="decimal" placeholder="e.g. 192" autocomplete="off"></label>
-            <label>Plate 3<input id="d2-3" inputmode="decimal" placeholder="e.g. 188" autocomplete="off"></label>
+            <label>Replicate 1<input id="w-d2-1" inputmode="decimal" /></label>
+            <label>Replicate 2<input id="w-d2-2" inputmode="decimal" /></label>
+            <label>Replicate 3<input id="w-d2-3" inputmode="decimal" /></label>
           </div>
-          <div class="small muted mono" id="avg-2" style="margin-top:0.75rem;">Average: —</div>
-        </div>
+          <p class="muted avg-line" id="w-avg-2">Average: —</p>
+        </article>
 
-        <div class="group">
+        <article class="card">
           <div class="row-head">
-            <strong>10^-3</strong>
-            <span class="pill" id="pill-3">Waiting for data</span>
+            <div>
+              <h3>10^-3</h3>
+              <p class="muted" id="w-pill-3">Waiting for data</p>
+            </div>
           </div>
           <div class="grid three">
-            <label>Plate 1<input id="d3-1" inputmode="decimal" placeholder="e.g. 42" autocomplete="off"></label>
-            <label>Plate 2<input id="d3-2" inputmode="decimal" placeholder="e.g. 44" autocomplete="off"></label>
-            <label>Plate 3<input id="d3-3" inputmode="decimal" placeholder="e.g. 41" autocomplete="off"></label>
+            <label>Replicate 1<input id="w-d3-1" inputmode="decimal" /></label>
+            <label>Replicate 2<input id="w-d3-2" inputmode="decimal" /></label>
+            <label>Replicate 3<input id="w-d3-3" inputmode="decimal" /></label>
           </div>
-          <div class="small muted mono" id="avg-3" style="margin-top:0.75rem;">Average: —</div>
-        </div>
+          <p class="muted avg-line" id="w-avg-3">Average: —</p>
+        </article>
 
-        <div class="group">
+        <article class="card">
           <div class="row-head">
-            <strong>10^-4</strong>
-            <span class="pill" id="pill-4">Waiting for data</span>
+            <div>
+              <h3>10^-4</h3>
+              <p class="muted" id="w-pill-4">Waiting for data</p>
+            </div>
           </div>
           <div class="grid three">
-            <label>Plate 1<input id="d4-1" inputmode="decimal" placeholder="e.g. 12" autocomplete="off"></label>
-            <label>Plate 2<input id="d4-2" inputmode="decimal" placeholder="e.g. 10" autocomplete="off"></label>
-            <label>Plate 3<input id="d4-3" inputmode="decimal" placeholder="e.g. 11" autocomplete="off"></label>
+            <label>Replicate 1<input id="w-d4-1" inputmode="decimal" /></label>
+            <label>Replicate 2<input id="w-d4-2" inputmode="decimal" /></label>
+            <label>Replicate 3<input id="w-d4-3" inputmode="decimal" /></label>
           </div>
-          <div class="small muted mono" id="avg-4" style="margin-top:0.75rem;">Average: —</div>
-        </div>
+          <p class="muted avg-line" id="w-avg-4">Average: —</p>
+        </article>
 
-        <div class="group">
+        <article class="card">
           <div class="row-head">
-            <strong>10^-5</strong>
-            <span class="pill" id="pill-5">Waiting for data</span>
+            <div>
+              <h3>10^-5</h3>
+              <p class="muted" id="w-pill-5">Waiting for data</p>
+            </div>
           </div>
           <div class="grid three">
-            <label>Plate 1<input id="d5-1" inputmode="decimal" placeholder="e.g. 2" autocomplete="off"></label>
-            <label>Plate 2<input id="d5-2" inputmode="decimal" placeholder="e.g. 1" autocomplete="off"></label>
-            <label>Plate 3<input id="d5-3" inputmode="decimal" placeholder="e.g. 3" autocomplete="off"></label>
+            <label>Replicate 1<input id="w-d5-1" inputmode="decimal" /></label>
+            <label>Replicate 2<input id="w-d5-2" inputmode="decimal" /></label>
+            <label>Replicate 3<input id="w-d5-3" inputmode="decimal" /></label>
           </div>
-          <div class="small muted mono" id="avg-5" style="margin-top:0.75rem;">Average: —</div>
-        </div>
-      </div>
-
-      <div class="actions">
-        <button class="btn btn-secondary" type="button" id="clearBtn">Clear All</button>
-      </div>
-      <div class="error" id="error"></div>
-    </section>
-
-    <section class="card">
+          <p class="muted avg-line" id="w-avg-5">Average: —</p>
+        </article>
+    <div class="card">
       <div class="results">
-        <div class="stat">
-          <div class="stat-label">Used dilution</div>
-          <div class="stat-value mono" id="usedDilution">—</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Reported average count</div>
-          <div class="stat-value mono" id="avgValue">—</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">CFU/mL</div>
-          <div class="stat-value mono" id="cfuMlValue">—</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">CFU/hand</div>
-          <div class="stat-value mono" id="cfuHandValue">—</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">log10 CFU/hand</div>
-          <div class="stat-value mono" id="logValue">—</div>
-        </div>
+        <div class="stat"><span class="label">Used dilution</span><span class="value" id="w-usedDilution">—</span></div>
+        <div class="stat"><span class="label">Reported average count</span><span class="value" id="w-avgValue">—</span></div>
+        <div class="stat"><span class="label">Reported CFU/mL</span><span class="value" id="w-cfuMlValue">—</span></div>
+        <div class="stat"><span class="label">Reported CFU/hand</span><span class="value" id="w-cfuHandValue">—</span></div>
+        <div class="stat"><span class="label">Reported log10 CFU/hand</span><span class="value" id="w-logValue">—</span></div>
       </div>
-      <p class="formula" id="formulaText">Formula: use the lowest dilution whose triplicate average is within 25-250; round the selected average to the nearest whole number for reporting; CFU/mL = rounded average x 10^dilution exponent; CFU/hand = CFU/mL x 75; log10 = log10(CFU/hand).</p>
-    </section>
-  </main>
-
-  <script>
-    const $ = (id) => document.getElementById(id);
-
-    function setTheme() {
-      const root = document.documentElement;
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
-    }
-
-    function toggleTheme() {
-      const root = document.documentElement;
-      root.setAttribute('data-theme', root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-    }
-
-    function parseNum(v) {
-      const s = v.trim();
-      if (s === '') return null;
-      const n = Number(s.replace(/,/g, ''));
-      return Number.isNaN(n) ? NaN : n;
-    }
-
-    function fmtNumber(n) {
-      if (!Number.isFinite(n)) return '—';
-      if (Number.isInteger(n)) return String(n);
-      return Number(n.toFixed(2)).toString();
-    }
-
-    function fmtSci(n) {
-      if (!Number.isFinite(n) || n <= 0) return '—';
-      const exp = Math.floor(Math.log10(n));
-      const mant = n / (10 ** exp);
-      return mant.toFixed(2) + ' x 10^' + exp;
-    }
-
-    function avgTriplicate(values) {
-      if (values.some(v => Number.isNaN(v))) return NaN;
-      if (values.some(v => v !== null && v < 0)) return NaN;
-      const filled = values.filter(v => v !== null);
-      if (filled.length === 0) return null;
-      if (filled.length !== 3) return 'incomplete';
-      return (filled[0] + filled[1] + filled[2]) / 3;
-    }
-
-    const COUNTABLE_MIN = 25;
-    const COUNTABLE_MAX = 250;
-
-    const dilutionRows = [
-      { key: '2', exponent: 2, label: '10^-2', inputs: ['d2-1', 'd2-2', 'd2-3'], avgNode: 'avg-2', pillNode: 'pill-2' },
-      { key: '3', exponent: 3, label: '10^-3', inputs: ['d3-1', 'd3-2', 'd3-3'], avgNode: 'avg-3', pillNode: 'pill-3' },
-      { key: '4', exponent: 4, label: '10^-4', inputs: ['d4-1', 'd4-2', 'd4-3'], avgNode: 'avg-4', pillNode: 'pill-4' },
-      { key: '5', exponent: 5, label: '10^-5', inputs: ['d5-1', 'd5-2', 'd5-3'], avgNode: 'avg-5', pillNode: 'pill-5' }
-    ];
-
-    function resetPills() {
-      dilutionRows.forEach(row => {
-        $(row.pillNode).textContent = 'Waiting for data';
-      });
-    }
-
-    function calculate() {
-      const errorNode = $('error');
-      errorNode.textContent = '';
-      resetPills();
-
-      const validRows = [];
-
-      for (const row of dilutionRows) {
-        const values = row.inputs.map(id => parseNum($(id).value));
-        const avg = avgTriplicate(values);
-        const avgNode = $(row.avgNode);
-        const pillNode = $(row.pillNode);
-
-        if (avg === null) {
-          avgNode.textContent = 'Average: —';
-          pillNode.textContent = 'Waiting for data';
-          continue;
-        }
-
-        if (avg === 'incomplete') {
-          avgNode.textContent = 'Average: —';
-          pillNode.textContent = 'Enter all 3';
-          if (!errorNode.textContent) errorNode.textContent = 'Each dilution must have all 3 replicate values before it can be used.';
-          continue;
-        }
-
-        if (Number.isNaN(avg)) {
-          avgNode.textContent = 'Average: —';
-          pillNode.textContent = 'Invalid entry';
-          errorNode.textContent = 'Use valid numbers that are zero or greater.';
-          continue;
-        }
-
-        avgNode.textContent = 'Average: ' + fmtNumber(avg);
-
-        if (avg >= COUNTABLE_MIN && avg <= COUNTABLE_MAX) {
-          pillNode.textContent = 'Countable';
-          validRows.push({ ...row, avg });
-        } else if (avg < COUNTABLE_MIN) {
-          pillNode.textContent = '<25';
-        } else {
-          pillNode.textContent = '>250';
-        }
-      }
-
-      const selected = validRows.length ? validRows[0] : null;
-
-      if (!selected) {
-        $('usedDilution').textContent = '—';
-        $('avgValue').textContent = '—';
-        $('cfuMlValue').textContent = '—';
-        $('cfuHandValue').textContent = '—';
-        $('logValue').textContent = '—';
-        $('formulaText').textContent = 'Formula: use the lowest dilution whose triplicate average is within 25-250; round the selected average to the nearest whole number for reporting; CFU/mL = rounded average x 10^dilution exponent; CFU/hand = CFU/mL x 75; log10 = log10(CFU/hand).';
-        if (!errorNode.textContent) errorNode.textContent = 'No dilution is currently in the 25-250 countable range.';
-        return;
-      }
-
-      $(selected.pillNode).textContent = 'Used';
-
-      const roundedAvg = Math.round(selected.avg);
-      const cfuMl = roundedAvg * (10 ** selected.exponent);
-      const cfuHand = cfuMl * 75;
-      const logHand = Math.log10(cfuHand);
-
-      $('usedDilution').textContent = selected.label;
-      $('avgValue').textContent = String(roundedAvg);
-      $('cfuMlValue').textContent = fmtSci(cfuMl);
-      $('cfuHandValue').textContent = fmtSci(cfuHand);
-      $('logValue').textContent = Number(logHand.toFixed(2)).toFixed(2);
-      $('formulaText').textContent =
-        'Using ' + selected.label + ' because it is the lowest dilution with an average in the 25-250 countable range. ' +
-        'Triplicate average = ' + fmtNumber(selected.avg) + ', rounded to ' + roundedAvg +
-        '; CFU/mL = ' + roundedAvg + ' x 10^' + selected.exponent + ' = ' + fmtSci(cfuMl) +
-        '; CFU/hand = ' + fmtSci(cfuMl) + ' x 75 = ' + fmtSci(cfuHand) +
-        '; log10(CFU/hand) = ' + Number(logHand.toFixed(2)).toFixed(2) + '.';
-    }
-
-    function clearAll() {
-      dilutionRows.forEach(row => {
-        row.inputs.forEach(id => $(id).value = '');
-        $(row.avgNode).textContent = 'Average: —';
-        $(row.pillNode).textContent = 'Waiting for data';
-      });
-
-      $('error').textContent = '';
-      $('usedDilution').textContent = '—';
-      $('avgValue').textContent = '—';
-      $('cfuMlValue').textContent = '—';
-      $('cfuHandValue').textContent = '—';
-      $('logValue').textContent = '—';
-      $('formulaText').textContent = 'Formula: use the lowest dilution whose triplicate average is within 25-250; round the selected average to the nearest whole number for reporting; CFU/mL = rounded average x 10^dilution exponent; CFU/hand = CFU/mL x 75; log10 = log10(CFU/hand).';
-
-      $('d2-1').focus();
-    }
-
-    function init() {
-      setTheme();
-      $('themeToggle').addEventListener('click', toggleTheme);
-      $('clearBtn').addEventListener('click', clearAll);
-
-      dilutionRows.forEach(row => {
-        row.inputs.forEach(id => {
-          $(id).addEventListener('input', calculate);
-          $(id).addEventListener('change', calculate);
-          $(id).addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') calculate();
-          });
-        });
-      });
-    }
-
-    init();
-  </script>
+      <p class="error" id="w-error"></p>
+      <p class="muted" id="w-formulaText">Formula: use the lowest dilution whose triplicate average is within 25-250; calculations keep full precision until the final reported result; log10 is shown to the hundredths place. [file:2]</p>
+      <div class="actions"><button class="btn btn-secondary" type="button" id="w-clearBtn">Clear</button></div>
+    </div>
   </section>
-
-  <script>
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    const tabPanels = document.querySelectorAll('.tab-panel');
-    tabButtons.forEach((button) => {
-      button.addEventListener('click', () => {
-        const target = button.dataset.tab;
-        tabButtons.forEach((btn) => {
-          const active = btn === button;
-          btn.classList.toggle('active', active);
-          btn.setAttribute('aria-selected', active ? 'true' : 'false');
-        });
-        tabPanels.forEach((panel) => {
-          const active = panel.id === `tab-${target}`;
-          panel.classList.toggle('active', active);
-        });
-      });
-    });
-  </script>
-  <script>
-const $ = (id) => document.getElementById(id);
-
-    function setTheme() {
-      const root = document.documentElement;
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+</div>
+<script>
+const root = document.documentElement;
+function setTheme() {
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+}
+function toggleTheme() {
+  root.setAttribute('data-theme', root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+}
+function $(id) { return document.getElementById(id); }
+function parseNum(v) {
+  const s = String(v).trim();
+  if (s === '') return null;
+  const n = Number(s.replace(/,/g,''));
+  return Number.isNaN(n) ? NaN : n;
+}
+function avgTriplicate(values) {
+  if (values.some(v => Number.isNaN(v))) return NaN;
+  if (values.some(v => v !== null && v < 0)) return NaN;
+  const filled = values.filter(v => v !== null);
+  if (filled.length === 0) return null;
+  if (filled.length !== 3) return 'incomplete';
+  return (filled[0] + filled[1] + filled[2]) / 3;
+}
+function roundTwoSigUSP(value) {
+  if (!Number.isFinite(value) || value === 0) return value;
+  const sign = Math.sign(value);
+  const abs = Math.abs(value);
+  const exp = Math.floor(Math.log10(abs));
+  const scaled = abs / Math.pow(10, exp - 1);
+  let s = scaled.toFixed(12).replace('.', '');
+  while (s.length < 6) s += '0';
+  const first = Number(s[0]);
+  let second = Number(s[1]);
+  const third = Number(s[2]);
+  const beyond = s.slice(3);
+  let roundUp = false;
+  if (third > 5) roundUp = true;
+  else if (third < 5) roundUp = false;
+  else if (/[^0]/.test(beyond)) roundUp = true;
+  else roundUp = second % 2 === 1;
+  if (roundUp) second += 1;
+  let sig = first * 10 + second;
+  let outExp = exp;
+  if (sig >= 100) { sig = 10; outExp += 1; }
+  return sign * sig * Math.pow(10, outExp - 1);
+}
+function fmtPlain(n, max=6) {
+  if (!Number.isFinite(n)) return '—';
+  return n.toLocaleString(undefined, { maximumFractionDigits: max });
+}
+function fmtSci2(n) {
+  if (!Number.isFinite(n) || n <= 0) return '—';
+  const exp = Math.floor(Math.log10(n));
+  const mant = n / Math.pow(10, exp);
+  return mant.toFixed(2) + ' x 10^' + exp;
+}
+function setDual(nodeId, reported, raw, sci=false, log=false) {
+  const node = $(nodeId);
+  if (!node) return;
+  if (!Number.isFinite(reported) || !Number.isFinite(raw)) { node.textContent = '—'; return; }
+  const main = log ? Number(reported.toFixed(2)).toFixed(2) : (sci ? fmtSci2(reported) : fmtPlain(reported, 2));
+  const sub = log ? Number(raw.toFixed(2)).toFixed(2) : (sci ? (() => { const exp = Math.floor(Math.log10(raw)); const mant = raw / Math.pow(10, exp); return mant.toFixed(3) + ' x 10^' + exp; })() : fmtPlain(raw, 6));
+  node.innerHTML = '<span class="result-main">' + main + '</span><span class="result-sub">Raw: ' + sub + '</span>';
+}
+function initCalculator(cfg) {
+  const rows = cfg.rows;
+  const resetPills = () => rows.forEach(r => $(cfg.prefix + 'pill-' + r.exp).textContent = 'Waiting for data');
+  function calculate() {
+    $(cfg.prefix + 'error').textContent = '';
+    resetPills();
+    const valid = [];
+    for (const row of rows) {
+      const values = [1,2,3].map(i => parseNum($(cfg.prefix + 'd' + row.exp + '-' + i).value));
+      const avg = avgTriplicate(values);
+      const avgNode = $(cfg.prefix + 'avg-' + row.exp);
+      const pillNode = $(cfg.prefix + 'pill-' + row.exp);
+      if (avg === null) { avgNode.textContent = 'Average: —'; continue; }
+      if (avg === 'incomplete') { avgNode.textContent = 'Average: —'; pillNode.textContent = 'Enter all 3'; if (!$(cfg.prefix + 'error').textContent) $(cfg.prefix + 'error').textContent = 'Each dilution must have all 3 replicate values before it can be used.'; continue; }
+      if (Number.isNaN(avg)) { avgNode.textContent = 'Average: —'; pillNode.textContent = 'Invalid entry'; $(cfg.prefix + 'error').textContent = 'Use valid numbers that are zero or greater.'; continue; }
+      avgNode.textContent = 'Average: ' + fmtPlain(avg, 2);
+      if (avg >= 25 && avg <= 250) { pillNode.textContent = 'Countable'; valid.push({...row, avg}); }
+      else if (avg < 25) pillNode.textContent = '<25';
+      else pillNode.textContent = '>250';
     }
-
-    function toggleTheme() {
-      const root = document.documentElement;
-      root.setAttribute('data-theme', root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    const selected = valid.length ? valid[0] : null;
+    if (!selected) {
+      $(cfg.prefix + 'usedDilution').textContent = '—';
+      ['avgValue','cfuMlValue','cfuHandValue','logValue'].forEach(id => $(cfg.prefix + id).textContent = '—');
+      if (!$(cfg.prefix + 'error').textContent) $(cfg.prefix + 'error').textContent = 'No dilution is currently in the 25-250 countable range.';
+      return;
     }
-
-    function parseNum(v) {
-      const s = v.trim();
-      if (s === '') return null;
-      const n = Number(s.replace(/,/g, ''));
-      return Number.isNaN(n) ? NaN : n;
-    }
-
-    function fmtNumber(n) {
-      if (!Number.isFinite(n)) return '—';
-      if (Number.isInteger(n)) return String(n);
-      return Number(n.toFixed(2)).toString();
-    }
-
-    function fmtSci(n) {
-      if (!Number.isFinite(n) || n <= 0) return '—';
-      const exp = Math.floor(Math.log10(n));
-      const mant = n / (10 ** exp);
-      return mant.toFixed(2) + ' x 10^' + exp;
-    }
-
-    function avgTriplicate(values) {
-      if (values.some(v => Number.isNaN(v))) return NaN;
-      if (values.some(v => v !== null && v < 0)) return NaN;
-      const filled = values.filter(v => v !== null);
-      if (filled.length === 0) return null;
-      if (filled.length !== 3) return 'incomplete';
-      return (filled[0] + filled[1] + filled[2]) / 3;
-    }
-
-    const COUNTABLE_MIN = 25;
-    const COUNTABLE_MAX = 250;
-
-    const dilutionRows = [
-      { key: '4', exponent: 4, label: '10^-4', inputs: ['d4-1', 'd4-2', 'd4-3'], avgNode: 'avg-4', pillNode: 'pill-4' },
-      { key: '5', exponent: 5, label: '10^-5', inputs: ['d5-1', 'd5-2', 'd5-3'], avgNode: 'avg-5', pillNode: 'pill-5' },
-      { key: '6', exponent: 6, label: '10^-6', inputs: ['d6-1', 'd6-2', 'd6-3'], avgNode: 'avg-6', pillNode: 'pill-6' }
-    ];
-
-    function resetPills() {
-      dilutionRows.forEach(row => {
-        $(row.pillNode).textContent = 'Waiting for data';
-      });
-    }
-
-    function calculate() {
-      const errorNode = $('error');
-      errorNode.textContent = '';
-      resetPills();
-
-      const validRows = [];
-
-      for (const row of dilutionRows) {
-        const values = row.inputs.map(id => parseNum($(id).value));
-        const avg = avgTriplicate(values);
-        const avgNode = $(row.avgNode);
-        const pillNode = $(row.pillNode);
-
-        if (avg === null) {
-          avgNode.textContent = 'Average: —';
-          pillNode.textContent = 'Waiting for data';
-          continue;
-        }
-
-        if (avg === 'incomplete') {
-          avgNode.textContent = 'Average: —';
-          pillNode.textContent = 'Enter all 3';
-          if (!errorNode.textContent) errorNode.textContent = 'Each dilution must have all 3 replicate values before it can be used.';
-          continue;
-        }
-
-        if (Number.isNaN(avg)) {
-          avgNode.textContent = 'Average: —';
-          pillNode.textContent = 'Invalid entry';
-          errorNode.textContent = 'Use valid numbers that are zero or greater.';
-          continue;
-        }
-
-        avgNode.textContent = 'Average: ' + fmtNumber(avg);
-
-        if (avg >= COUNTABLE_MIN && avg <= COUNTABLE_MAX) {
-          pillNode.textContent = 'Countable';
-          validRows.push({ ...row, avg });
-        } else if (avg < COUNTABLE_MIN) {
-          pillNode.textContent = '<25';
-        } else {
-          pillNode.textContent = '>250';
-        }
-      }
-
-      const selected = validRows.length ? validRows[0] : null;
-
-      if (!selected) {
-        $('usedDilution').textContent = '—';
-        $('avgValue').textContent = '—';
-        $('cfuMlValue').textContent = '—';
-        $('cfuHandValue').textContent = '—';
-        $('logValue').textContent = '—';
-        $('formulaText').textContent = 'Formula: average triplicate count must be within 25-250; use the lowest dilution in countable range; CFU/mL = average x 10^dilution exponent; CFU/hand = CFU/mL x 75; log10 = log10(CFU/hand).';
-        if (!errorNode.textContent) errorNode.textContent = 'No dilution is currently in the 25-250 countable range.';
-        return;
-      }
-
-      $(selected.pillNode).textContent = 'Used';
-
-      const cfuMl = selected.avg * (10 ** selected.exponent);
-      const cfuHand = cfuMl * 75;
-      const logHand = Math.log10(cfuHand);
-
-      $('usedDilution').textContent = selected.label;
-      $('avgValue').textContent = fmtNumber(selected.avg);
-      $('cfuMlValue').textContent = fmtSci(cfuMl);
-      $('cfuHandValue').textContent = fmtSci(cfuHand);
-      $('logValue').textContent = Number(logHand.toFixed(2)).toFixed(2);
-      $('formulaText').textContent =
-        'Using ' + selected.label + ' because it is the lowest dilution with an average in the 25-250 countable range. Average = ' + fmtNumber(selected.avg) +
-        '; CFU/mL = ' + fmtNumber(selected.avg) + ' x 10^' + selected.exponent + ' = ' + fmtSci(cfuMl) +
-        '; CFU/hand = ' + fmtSci(cfuMl) + ' x 75 = ' + fmtSci(cfuHand) +
-        '; log10(CFU/hand) = ' + Number(logHand.toFixed(2)).toFixed(2) + '.';
-    }
-
-    function clearAll() {
-      dilutionRows.forEach(row => {
-        row.inputs.forEach(id => $(id).value = '');
-        $(row.avgNode).textContent = 'Average: —';
-        $(row.pillNode).textContent = 'Waiting for data';
-      });
-
-      $('error').textContent = '';
-      $('usedDilution').textContent = '—';
-      $('avgValue').textContent = '—';
-      $('cfuMlValue').textContent = '—';
-      $('cfuHandValue').textContent = '—';
-      $('logValue').textContent = '—';
-      $('formulaText').textContent = 'Formula: average triplicate count must be within 25-250; use the lowest dilution in countable range; CFU/mL = average x 10^dilution exponent; CFU/hand = CFU/mL x 75; log10 = log10(CFU/hand).';
-
-      $('d4-1').focus();
-    }
-
-    function init() {
-      setTheme();
-      $('themeToggle').addEventListener('click', toggleTheme);
-      $('clearBtn').addEventListener('click', clearAll);
-
-      dilutionRows.forEach(row => {
-        row.inputs.forEach(id => {
-          $(id).addEventListener('input', calculate);
-          $(id).addEventListener('change', calculate);
-          $(id).addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') calculate();
-          });
-        });
-      });
-    }
-
-    init();
-  </script>
-  <script>
-const $ = (id) => document.getElementById(id);
-
-    function setTheme() {
-      const root = document.documentElement;
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      root.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
-    }
-
-    function toggleTheme() {
-      const root = document.documentElement;
-      root.setAttribute('data-theme', root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-    }
-
-    function parseNum(v) {
-      const s = v.trim();
-      if (s === '') return null;
-      const n = Number(s.replace(/,/g, ''));
-      return Number.isNaN(n) ? NaN : n;
-    }
-
-    function fmtNumber(n) {
-      if (!Number.isFinite(n)) return '—';
-      if (Number.isInteger(n)) return String(n);
-      return Number(n.toFixed(2)).toString();
-    }
-
-    function fmtSci(n) {
-      if (!Number.isFinite(n) || n <= 0) return '—';
-      const exp = Math.floor(Math.log10(n));
-      const mant = n / (10 ** exp);
-      return mant.toFixed(2) + ' x 10^' + exp;
-    }
-
-    function avgTriplicate(values) {
-      if (values.some(v => Number.isNaN(v))) return NaN;
-      if (values.some(v => v !== null && v < 0)) return NaN;
-      const filled = values.filter(v => v !== null);
-      if (filled.length === 0) return null;
-      if (filled.length !== 3) return 'incomplete';
-      return (filled[0] + filled[1] + filled[2]) / 3;
-    }
-
-    const COUNTABLE_MIN = 25;
-    const COUNTABLE_MAX = 250;
-
-    const dilutionRows = [
-      { key: '2', exponent: 2, label: '10^-2', inputs: ['d2-1', 'd2-2', 'd2-3'], avgNode: 'avg-2', pillNode: 'pill-2' },
-      { key: '3', exponent: 3, label: '10^-3', inputs: ['d3-1', 'd3-2', 'd3-3'], avgNode: 'avg-3', pillNode: 'pill-3' },
-      { key: '4', exponent: 4, label: '10^-4', inputs: ['d4-1', 'd4-2', 'd4-3'], avgNode: 'avg-4', pillNode: 'pill-4' },
-      { key: '5', exponent: 5, label: '10^-5', inputs: ['d5-1', 'd5-2', 'd5-3'], avgNode: 'avg-5', pillNode: 'pill-5' }
-    ];
-
-    function resetPills() {
-      dilutionRows.forEach(row => {
-        $(row.pillNode).textContent = 'Waiting for data';
-      });
-    }
-
-    function calculate() {
-      const errorNode = $('error');
-      errorNode.textContent = '';
-      resetPills();
-
-      const validRows = [];
-
-      for (const row of dilutionRows) {
-        const values = row.inputs.map(id => parseNum($(id).value));
-        const avg = avgTriplicate(values);
-        const avgNode = $(row.avgNode);
-        const pillNode = $(row.pillNode);
-
-        if (avg === null) {
-          avgNode.textContent = 'Average: —';
-          pillNode.textContent = 'Waiting for data';
-          continue;
-        }
-
-        if (avg === 'incomplete') {
-          avgNode.textContent = 'Average: —';
-          pillNode.textContent = 'Enter all 3';
-          if (!errorNode.textContent) errorNode.textContent = 'Each dilution must have all 3 replicate values before it can be used.';
-          continue;
-        }
-
-        if (Number.isNaN(avg)) {
-          avgNode.textContent = 'Average: —';
-          pillNode.textContent = 'Invalid entry';
-          errorNode.textContent = 'Use valid numbers that are zero or greater.';
-          continue;
-        }
-
-        avgNode.textContent = 'Average: ' + fmtNumber(avg);
-
-        if (avg >= COUNTABLE_MIN && avg <= COUNTABLE_MAX) {
-          pillNode.textContent = 'Countable';
-          validRows.push({ ...row, avg });
-        } else if (avg < COUNTABLE_MIN) {
-          pillNode.textContent = '<25';
-        } else {
-          pillNode.textContent = '>250';
-        }
-      }
-
-      const selected = validRows.length ? validRows[0] : null;
-
-      if (!selected) {
-        $('usedDilution').textContent = '—';
-        $('avgValue').textContent = '—';
-        $('cfuMlValue').textContent = '—';
-        $('cfuHandValue').textContent = '—';
-        $('logValue').textContent = '—';
-        $('formulaText').textContent = 'Formula: use the lowest dilution whose triplicate average is within 25-250; round the selected average to the nearest whole number for reporting; CFU/mL = rounded average x 10^dilution exponent; CFU/hand = CFU/mL x 75; log10 = log10(CFU/hand).';
-        if (!errorNode.textContent) errorNode.textContent = 'No dilution is currently in the 25-250 countable range.';
-        return;
-      }
-
-      $(selected.pillNode).textContent = 'Used';
-
-      const roundedAvg = Math.round(selected.avg);
-      const cfuMl = roundedAvg * (10 ** selected.exponent);
-      const cfuHand = cfuMl * 75;
-      const logHand = Math.log10(cfuHand);
-
-      $('usedDilution').textContent = selected.label;
-      $('avgValue').textContent = String(roundedAvg);
-      $('cfuMlValue').textContent = fmtSci(cfuMl);
-      $('cfuHandValue').textContent = fmtSci(cfuHand);
-      $('logValue').textContent = Number(logHand.toFixed(2)).toFixed(2);
-      $('formulaText').textContent =
-        'Using ' + selected.label + ' because it is the lowest dilution with an average in the 25-250 countable range. ' +
-        'Triplicate average = ' + fmtNumber(selected.avg) + ', rounded to ' + roundedAvg +
-        '; CFU/mL = ' + roundedAvg + ' x 10^' + selected.exponent + ' = ' + fmtSci(cfuMl) +
-        '; CFU/hand = ' + fmtSci(cfuMl) + ' x 75 = ' + fmtSci(cfuHand) +
-        '; log10(CFU/hand) = ' + Number(logHand.toFixed(2)).toFixed(2) + '.';
-    }
-
-    function clearAll() {
-      dilutionRows.forEach(row => {
-        row.inputs.forEach(id => $(id).value = '');
-        $(row.avgNode).textContent = 'Average: —';
-        $(row.pillNode).textContent = 'Waiting for data';
-      });
-
-      $('error').textContent = '';
-      $('usedDilution').textContent = '—';
-      $('avgValue').textContent = '—';
-      $('cfuMlValue').textContent = '—';
-      $('cfuHandValue').textContent = '—';
-      $('logValue').textContent = '—';
-      $('formulaText').textContent = 'Formula: use the lowest dilution whose triplicate average is within 25-250; round the selected average to the nearest whole number for reporting; CFU/mL = rounded average x 10^dilution exponent; CFU/hand = CFU/mL x 75; log10 = log10(CFU/hand).';
-
-      $('d2-1').focus();
-    }
-
-    function init() {
-      setTheme();
-      $('themeToggle').addEventListener('click', toggleTheme);
-      $('clearBtn').addEventListener('click', clearAll);
-
-      dilutionRows.forEach(row => {
-        row.inputs.forEach(id => {
-          $(id).addEventListener('input', calculate);
-          $(id).addEventListener('change', calculate);
-          $(id).addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') calculate();
-          });
-        });
-      });
-    }
-
-    init();
-  </script>
+    $(cfg.prefix + 'pill-' + selected.exp).textContent = 'Used';
+    const rawAvg = selected.avg;
+    const reportedAvg = roundTwoSigUSP(rawAvg);
+    const rawCfuMl = rawAvg * Math.pow(10, selected.exp);
+    const reportedCfuMl = roundTwoSigUSP(rawCfuMl);
+    const rawCfuHand = rawCfuMl * 75;
+    const reportedCfuHand = roundTwoSigUSP(rawCfuHand);
+    const rawLog = Math.log10(rawCfuHand);
+    const reportedLog = Math.log10(reportedCfuHand);
+    $(cfg.prefix + 'usedDilution').textContent = '10^-' + selected.exp;
+    setDual(cfg.prefix + 'avgValue', reportedAvg, rawAvg, false, false);
+    setDual(cfg.prefix + 'cfuMlValue', reportedCfuMl, rawCfuMl, true, false);
+    setDual(cfg.prefix + 'cfuHandValue', reportedCfuHand, rawCfuHand, true, false);
+    setDual(cfg.prefix + 'logValue', reportedLog, rawLog, false, true);
+  }
+  function clearAll() {
+    rows.forEach(r => [1,2,3].forEach(i => $(cfg.prefix + 'd' + r.exp + '-' + i).value = ''));
+    ['usedDilution','avgValue','cfuMlValue','cfuHandValue','logValue','error'].forEach(id => $(cfg.prefix + id).textContent = id === 'error' ? '' : '—');
+    rows.forEach(r => { $(cfg.prefix + 'avg-' + r.exp).textContent = 'Average: —'; $(cfg.prefix + 'pill-' + r.exp).textContent = 'Waiting for data'; });
+  }
+  rows.forEach(r => [1,2,3].forEach(i => {
+    $(cfg.prefix + 'd' + r.exp + '-' + i).addEventListener('input', calculate);
+    $(cfg.prefix + 'd' + r.exp + '-' + i).addEventListener('change', calculate);
+  }));
+  $(cfg.prefix + 'clearBtn').addEventListener('click', clearAll);
+  calculate();
+}
+document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', () => {
+  const target = btn.dataset.tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + target));
+}));
+setTheme();
+$('themeToggle').addEventListener('click', toggleTheme);
+initCalculator({ prefix:'b-', rows:[{exp:4},{exp:5},{exp:6}] });
+initCalculator({ prefix:'w-', rows:[{exp:2},{exp:3},{exp:4},{exp:5}] });
+</script>
 </body>
 </html>
