@@ -458,7 +458,7 @@ function fmtSci2(n) {
   if (!Number.isFinite(n) || n <= 0) return '—';
   const exp = Math.floor(Math.log10(n));
   const mant = n / Math.pow(10, exp);
-  return mant.toFixed(2) + ' x 10^' + exp;
+  return Number(mant.toPrecision(2)).toString() + ' x 10^' + exp;
 }
 function setDual(nodeId, reported, raw, sci=false, log=false) {
   const node = $(nodeId);
